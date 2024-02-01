@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { UsersService } from '../../services/users.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -27,13 +27,28 @@ export class LoginComponent {
 
   email: string = '';
   password: string = '';
+  repeatPassword: string = '';
   error: string = '';
   firstName: string = ''; 
   lastName: string = '';
 
+  loginForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    repeatPassword: new FormControl('') 
+  });
   async login() {
     console.log(this.mode);
     
+    if(this.mode === 'register' &&this.password.length<6){
+      this.error = 'Min: caracters 6';
+      return;
+    }
+    if (this.mode === 'register' && this.password !== this.repeatPassword) {
+      this.error = 'Passwords do not match';
+      return;
+    } 
+   
     if (this.mode === 'login') {
       console.log("Entra a login");
       
@@ -47,7 +62,7 @@ export class LoginComponent {
       console.log("modo registro")
       try {
         await this.usersService.register(this.firstName, this.lastName, this.email, this.password);
-        
+        this.router.navigate(['userManagement/login']);
        // this.router.navigate(['favorites']);
       } catch (error) {
         // Manejar errores de registro
