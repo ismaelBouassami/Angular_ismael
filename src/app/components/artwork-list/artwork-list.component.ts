@@ -8,7 +8,7 @@ import { FilterService } from '../../services/filter.service';
 import { debounceTime, filter } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 import { PaginationComponent } from '../paginacion/paginacion.component';
-import { NgxPaginationModule } from 'ngx-pagination';
+
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -53,19 +53,19 @@ export class ArtworkListComponent implements OnInit {
     
     this.artService.getArtWorks().subscribe((artworks: IArtwork[]) => {
       this.quadres = artworks;
-      this.totalPages = Math.ceil(this.quadres.length / 3); // Suponiendo que quieres mostrar 10 obras de arte por página
+      this.totalPages = Math.ceil(this.quadres.length / 6); // NUm de obras a mostrar
       this.setPage(this.currentPage);
     });
   }
 
   setPage(page: number): void {
     this.currentPage = page;
-    let startIndex = (page - 1) * 3;
-    let endIndex = Math.min(startIndex + 3, this.quadres.length);
+    let startIndex = (page - 1) * 6;
+    let endIndex = Math.min(startIndex + 6, this.quadres.length);
 
     console.log("start y end "+ startIndex +" " + endIndex);
     this.pagedItems = this.quadres.slice(startIndex, endIndex);
-    console.log('paginaItems'+this.pagedItems);
+
   }
 
   nextPage(): void {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createClient } from '@supabase/supabase-js'
 import { Observable, Subject, from, tap } from 'rxjs';
 import { IUser } from '../interfaces/user';
-import { environment } from '../../environments/environments';
+import { environment } from '../../environments/environmets';
 
 
 const emptyUser: IUser = {id: '0', avatar_url: 'none', full_name: 'none', username: 'none', website:'none' }
@@ -48,6 +48,55 @@ export class UsersService {
         }
       return false;
   }
+
+  async register(firstName: string, lastName: string, email: string, password: string): Promise<boolean> {
+    try {
+      const { data, error } = await this.supaClient.auth.signUp({
+        email,
+        password,
+        data: {
+          first_name: firstName,
+          last_name: lastName
+        }
+      });
+
+      if (error) {
+        console.error('Error registering user:', error);
+        return false;
+      }
+
+      if (data?.user != null) {
+   
+        this.createProfile(data.user.id, firstName, lastName); 
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Error registering user:', error);
+      return false;
+    }
+}
+
+async createProfile(userId: string, firstName: string, lastName: string): Promise<void> {
+    try {
+      const defaultAvatarUrl = '../assets/logo.svg';
+        const { data, error } = await this.supaClient.from('profiles').insert([
+            { id: userId, username: firstName, full_name: lastName,avatar_url: defaultAvatarUrl}
+        ]);
+        
+        if (error) {
+            console.error('Error creating profile:', error);
+            throw error;
+        }
+
+        console.log('Profile created successfully:', data);
+    } catch (error) {
+        console.error('Error creating profile:', error);
+        throw error;
+    }
+}
+
 
   getProfile(userId:string): void{
 

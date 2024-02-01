@@ -4,9 +4,9 @@
 
 </div>
 <div class="container">
-  <h1>Artworks List</h1>
+
   <div class="row">
-    <!-- Mostrar solo los elementos de la página actual que coincidan con el filtro -->
+ 
     <ng-container *ngFor="let artwork of pagedItems| artworkFilter: filter;">
       <div class="col">
         <app-artwork [artwork]="artwork" (likeChanged)="toggleLike($event, artwork)"></app-artwork>
@@ -14,5 +14,6 @@
       
     </ng-container>
     </div>
-    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages"></app-pagination></div>
+    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages">
+    </app-pagination></div>
  

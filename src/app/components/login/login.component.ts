@@ -15,7 +15,7 @@ export class LoginComponent {
 
   constructor(private usersService: UsersService, private router: Router) { }
   mode: string = 'login';
-
+  
   @Input()
   set setmode(value: string) {
     this.mode = value;
@@ -28,16 +28,33 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   error: string = '';
+  firstName: string = ''; 
+  lastName: string = '';
 
   async login() {
-    let logged = await this.usersService.login(this.email, this.password);
-    if (logged) {
-      this.router.navigate(['favorites']);
-    } else {
-      this.error = 'Bad Email or Password'
-    }
+    console.log(this.mode);
+    
+    if (this.mode === 'login') {
+      console.log("Entra a login");
+      
+      let logged = await this.usersService.login(this.email, this.password);
+      if (logged) {
+        this.router.navigate(['favorites']);
+      } else {
+        this.error = 'Bad Email or Password';
+      }
+    } else if (this.mode === 'register') {
+      console.log("modo registro")
+      try {
+        await this.usersService.register(this.firstName, this.lastName, this.email, this.password);
+        
+       // this.router.navigate(['favorites']);
+      } catch (error) {
+        // Manejar errores de registro
+        this.error = 'Error during registration';
+      }
   }
 
 
 
-}
+}}
