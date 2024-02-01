@@ -7,13 +7,17 @@ import { ArtworkFilterPipe } from '../../pipes/artwork-filter.pipe';
 import { FilterService } from '../../services/filter.service';
 import { debounceTime, filter } from 'rxjs';
 import { UsersService } from '../../services/users.service';
+import { PaginationComponent } from '../paginacion/paginacion.component';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-artwork-list',
   standalone: true,
-  imports: [ArtworkComponent,
+  imports: [ArtworkComponent,CommonModule,
     ArtworkRowComponent,
-    ArtworkFilterPipe
+    ArtworkFilterPipe,
+    PaginationComponent
   ],
   templateUrl: './artwork-list.component.html',
   styleUrl: './artwork-list.component.css'
@@ -28,7 +32,7 @@ export class ArtworkListComponent implements OnInit {
 
   ngOnInit(): void {
     console.log(this.onlyFavorites);
-
+    this.loadArtworks();
     if (this.onlyFavorites != 'favorites') {
       this.artService.getArtWorks()
         .subscribe((artworkList: IArtwork[]) => this.quadres = artworkList);
@@ -40,12 +44,45 @@ export class ArtworkListComponent implements OnInit {
 
 
     this.filterService.searchFilter.pipe(
-      //filter(f=> f.length> 4 || f.length ===0),
+      
       debounceTime(500)
     ).subscribe(filter => this.artService.filterArtWorks(filter));
 
   }
+  loadArtworks(): void {
+    
+    this.artService.getArtWorks().subscribe((artworks: IArtwork[]) => {
+      this.quadres = artworks;
+      this.totalPages = Math.ceil(this.quadres.length / 3); // Suponiendo que quieres mostrar 10 obras de arte por página
+      this.setPage(this.currentPage);
+    });
+  }
 
+  setPage(page: number): void {
+    this.currentPage = page;
+    let startIndex = (page - 1) * 3;
+    let endIndex = Math.min(startIndex + 3, this.quadres.length);
+
+    console.log("start y end "+ startIndex +" " + endIndex);
+    this.pagedItems = this.quadres.slice(startIndex, endIndex);
+    console.log('paginaItems'+this.pagedItems);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.setPage(this.currentPage);
+    }
+    console.log('Siguiente pagina ===>'+this.currentPage);
+    
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.setPage(this.currentPage);
+    }
+  }
   toggleLike($event: boolean, artwork: IArtwork) {
     console.log($event, artwork);
     artwork.like = !artwork.like;
@@ -53,7 +90,13 @@ export class ArtworkListComponent implements OnInit {
   }
 
   quadres: IArtwork[] = [];
+  pagedItems:IArtwork[]=[];
+  currentPage=1;
+  totalPages!:number;
+  page!:number;
   filter: string = '';
   @Input() onlyFavorites: string = '';
 
+
+  
 }
