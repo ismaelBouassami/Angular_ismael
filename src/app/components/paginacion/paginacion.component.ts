@@ -1,40 +1,67 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { ApiServiceService } from '../../services/api-service.service';
+import { ArtworkListComponent } from '../artwork-list/artwork-list.component';
+import { IArtwork } from '../../interfaces/i-artwork';
+import { PaginacionService } from '../../services/paginacion.service';
 
 @Component({
   selector: 'app-pagination',
   standalone: true,
-  imports: [],
+  imports: [ArtworkListComponent, RouterLink],
   templateUrl: './paginacion.component.html',
   styleUrl: './paginacion.component.css'
 })
 export class PaginationComponent implements OnInit {
-  @Input() currentPage!: number;
-  @Input() totalPages!: number;
+  @Input() currentPage: number = 1;
+  @Input() totalPages: number = 0;
 
-  constructor(private router: Router) { }
+
+  constructor(private router: Router, private http: HttpClient, private artService: ApiServiceService, private paginacionService: PaginacionService) { }
 
   ngOnInit(): void {
+    this.fetchTotalPages(); 
+    this.paginacionService.getVariable();
+  }
+
+  fetchTotalPages(): void {
+    this.http.get<any>('https://api.artic.edu/api/v1/artworks')
+      .subscribe((response: any) => {
+        this.totalPages = response.pagination.total_pages;
+      });
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
-      this.navigateToPage(this.currentPage - 1);
+      this.currentPage -= 1; 
+      this.paginacionService.setVariable(this.currentPage);
+
+      this.router.navigate(['/artwork/page/', this.currentPage]);
     }
   }
-
+  
+  goPage(page:number): void{
+    this.currentPage=page;
+ this.paginacionService.setVariable(this.currentPage);
+    this.router.navigate(['/artwork/page/', page]);
+  }
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
-      this.navigateToPage(this.currentPage + 1);
+      this.currentPage += 1; 
+      this.paginacionService.setVariable(this.currentPage);
+      console.log('sumando paginas'+this.currentPage);
+      
+      this.router.navigate(['/artwork/page/', this.currentPage]);
     }
   }
 
-  navigateToPage(page: number): void {
-    this.router.navigate([], {
-      queryParams: { page },
-      queryParamsHandling: 'merge' // Preserva otros parámetros de consulta
-    });
-  }
-}
-  
 
+  // navigateToPage(page: number): void {
+  //   this.router.navigate([], {
+  //     queryParams: { page },
+  //     queryParamsHandling: 'merge' 
+  //   });
+
+  // }
+}

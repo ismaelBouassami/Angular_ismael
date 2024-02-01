@@ -26,6 +26,13 @@ export class ApiServiceService {
     );
     return this.artworksSubject;
   }
+  public getArtWorksPage(pageNumber: number): Observable<IArtwork[]> {
+    const url1 = `${url}?page=${pageNumber}`;
+
+    return this.http.get<{ data: IArtwork[] }>(url1).pipe(
+      map(response => response.data)
+    );
+    }
 
   public filterArtWorks(filter:string): void{
     this.http.get<{ data: IArtwork[] }>(`${url}/search?q=${filter}&fields=id,description,title,image_id`).pipe(

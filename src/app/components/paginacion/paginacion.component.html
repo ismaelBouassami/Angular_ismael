@@ -1,5 +1,31 @@
-<div>
-  <button (click)="previousPage()">Anterior</button>
+<!-- <div>
+  <button (click)="previousPage()" [routerLink]="['/artwork/page/',currentPage]">Anterior</button>
   <span>Página {{ currentPage }} de {{ totalPages }}</span>
-  <button (click)="nextPage()">Siguiente</button>
-</div>
+  <button (click)="nextPage()" [routerLink]="['/artwork/page/',currentPage]">Siguiente</button>
+</div> -->
+
+
+
+
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+    <li class="page-item ">
+      @if (currentPage!=1) {
+      <a class="page-link" (click)="previousPage()">Previous</a>
+      }
+    </li>
+    <li class="page-item"><a class="page-link"  (click)="goPage(1)">1</a></li>
+                                                                        
+    @if (currentPage+2<=totalPages) {
+    <li class="page-item"><a class="page-link" (click)="goPage(currentPage+1)">{{currentPage+1}}</a></li>
+    <li class="page-item"><a class="page-link" (click)="goPage(currentPage+2)">{{currentPage+2}}</a></li>
+    }
+   
+    <li class="page-item">
+      <a class="page-link" (click)="nextPage()">Next</a>
+    </li>
+
+    <span>Página {{ this.currentPage }} {{ currentPage }} de {{ totalPages }}</span>
+  </ul>
+</nav>

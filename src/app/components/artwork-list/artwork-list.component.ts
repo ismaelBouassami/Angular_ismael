@@ -8,13 +8,15 @@ import { FilterService } from '../../services/filter.service';
 import { debounceTime, filter } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 import { PaginationComponent } from '../paginacion/paginacion.component';
-import { NgxPaginationModule } from 'ngx-pagination';
+
 import { CommonModule } from '@angular/common';
+import { NavigationEnd, Router } from '@angular/router';
+import { PaginacionService } from '../../services/paginacion.service';
 
 @Component({
   selector: 'app-artwork-list',
   standalone: true,
-  imports: [ArtworkComponent,CommonModule,NgxPaginationModule,
+  imports: [ArtworkComponent,CommonModule,
     ArtworkRowComponent,
     ArtworkFilterPipe,
     PaginationComponent
@@ -26,11 +28,28 @@ export class ArtworkListComponent implements OnInit {
 
   constructor(private artService: ApiServiceService,
     private filterService: FilterService,
-    private usesService: UsersService
+    private usesService: UsersService,private router: Router,private paginacionService: PaginacionService
   ) {
   }
 
   ngOnInit(): void {
+
+    this.router.events.subscribe(event => {
+      
+      if (event instanceof NavigationEnd) {
+        this.currentPage= this.paginacionService.getVariable();
+        const regex = /\/artwork\/page\/\d+/;
+        const match = event.url.match(regex);
+        if (match) {
+          console.log('entra en el cambio de ruta')
+          console.log('Número de página:', this.currentPage,) ;
+          // Llamar a la función para manejar el cambio de ruta con el número de página
+          this.nextPageArtwoks();
+        }
+      }
+    });
+
+
     console.log(this.onlyFavorites);
     this.loadArtworks();
     if (this.onlyFavorites != 'favorites') {
@@ -50,39 +69,20 @@ export class ArtworkListComponent implements OnInit {
 
   }
   loadArtworks(): void {
-    
     this.artService.getArtWorks().subscribe((artworks: IArtwork[]) => {
       this.quadres = artworks;
-      this.totalPages = Math.ceil(this.quadres.length / 6); // NUm de obras a mostrar
-      this.setPage(this.currentPage);
+      this.pagedItems = artworks;
     });
   }
-
-  setPage(page: number): void {
-    this.currentPage = page;
-    let startIndex = (page - 1) * 6;
-    let endIndex = Math.min(startIndex + 6, this.quadres.length);
-
-    console.log("start y end "+ startIndex +" " + endIndex);
-    this.pagedItems = this.quadres.slice(startIndex, endIndex);
-
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.setPage(this.currentPage);
-    }
-    console.log('Siguiente pagina ===>'+this.currentPage);
+  nextPageArtwoks(): void{
+    console.log('Entra en el cambio de pagina nxtPageArtworks'+this.currentPage);
     
+    this.artService.getArtWorksPage(this.currentPage).subscribe((artworks: IArtwork[])=>{
+      this.pagedItems = artworks;
+    })
   }
 
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.setPage(this.currentPage);
-    }
-  }
+
   toggleLike($event: boolean, artwork: IArtwork) {
     console.log($event, artwork);
     artwork.like = !artwork.like;
@@ -91,7 +91,7 @@ export class ArtworkListComponent implements OnInit {
 
   quadres: IArtwork[] = [];
   pagedItems:IArtwork[]=[];
-  currentPage=1;
+  currentPage!:number;
   totalPages!:number;
   page!:number;
   filter: string = '';

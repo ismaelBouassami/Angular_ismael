@@ -8,6 +8,7 @@ export const routes: Routes = [
   {path: 'artworks', component: ArtworkListComponent},
   {path: 'artworks/:onlyFavorites', component: ArtworkListComponent},
   {path: 'artwork/:id', component: ArtworkComponent},
+  {path: 'artwork/page:page',component: ArtworkListComponent},
   {path: 'profile', component: ProfileComponent},
   {path: 'favorites', redirectTo: 'artworks/favorites'},
   {path: 'userManagement/:setmode', component: LoginComponent},

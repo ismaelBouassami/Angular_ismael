@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createClient } from '@supabase/supabase-js'
 import { Observable, Subject, from, tap } from 'rxjs';
 import { IUser } from '../interfaces/user';
-import { environment } from '../../environments/environmets';
+import { environment } from '../../environments/environments';
 
 
 const emptyUser: IUser = {id: '0', avatar_url: 'none', full_name: 'none', username: 'none', website:'none' }
