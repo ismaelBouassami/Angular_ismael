@@ -54,10 +54,7 @@ export class UsersService {
       const { data, error } = await this.supaClient.auth.signUp({
         email,
         password,
-        data: {
-          first_name: firstName,
-          last_name: lastName
-        }
+       
       });
 
       if (error) {
@@ -66,8 +63,26 @@ export class UsersService {
       }
 
       if (data?.user != null) {
-   
-        this.createProfile(data.user.id, firstName, lastName); 
+        const defaultAvatarUrl = '../assets/logo.svg';
+        //this.createProfile(data.user.id, firstName, lastName); 
+        console.log(firstName+"----"+lastName+"----"+defaultAvatarUrl);
+        
+        if (data?.user != null) {
+          const { error: profileError } = await this.supaClient
+            .from('profiles')
+            .update({
+              username: firstName,
+              full_name: lastName,
+              avatar_url: defaultAvatarUrl,
+            })
+            .eq('id', data.user.id);
+  
+          if (profileError) {
+            console.error('Error updating profile:', profileError);
+            return false;
+          }
+          return true;
+        }
         return true;
       }
 

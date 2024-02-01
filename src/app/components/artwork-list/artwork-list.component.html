@@ -1,19 +1,30 @@
+<!-- <div class="container">
+    <h1>Artworks List</h1>
+    <div class="row">
+
+      <ng-container *ngFor="let artwork of quadres| paginate:{itemsPerPage:4,currentPage:page}| artworkFilter: filter;">
+        <div class="col">
+          <app-artwork [artwork]="artwork" (likeChanged)="toggleLike($event, artwork)"></app-artwork>
+        </div>
+      </ng-container>
+      <div class="d-flex justify-content-center align-items-center">
+    <pagination-controls (pageChange)="page = $event" previousLabel="Anterior" nextLabel="Siguiente"></pagination-controls>
+</div> -->
+
+
+
+
 <div class="container">
-<h1>Artworks List</h1>
+    <h1>Artworks List</h1>
+    <div class="row">
 
+        <ng-container *ngFor="let artwork of pagedItems| artworkFilter: filter;">
+            <div class="col">
+                <app-artwork [artwork]="artwork" (likeChanged)="toggleLike($event, artwork)"></app-artwork>
+            </div>
 
-</div>
-<div class="container">
-
-  <div class="row">
- 
-    <ng-container *ngFor="let artwork of pagedItems| artworkFilter: filter;">
-      <div class="col">
-        <app-artwork [artwork]="artwork" (likeChanged)="toggleLike($event, artwork)"></app-artwork>
-      </div>
-      
-    </ng-container>
+        </ng-container>
     </div>
     <app-pagination [currentPage]="currentPage" [totalPages]="totalPages">
-    </app-pagination></div>
- 
+    </app-pagination>
+</div>

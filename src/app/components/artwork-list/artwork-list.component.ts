@@ -8,13 +8,13 @@ import { FilterService } from '../../services/filter.service';
 import { debounceTime, filter } from 'rxjs';
 import { UsersService } from '../../services/users.service';
 import { PaginationComponent } from '../paginacion/paginacion.component';
-
+import { NgxPaginationModule } from 'ngx-pagination';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-artwork-list',
   standalone: true,
-  imports: [ArtworkComponent,CommonModule,
+  imports: [ArtworkComponent,CommonModule,NgxPaginationModule,
     ArtworkRowComponent,
     ArtworkFilterPipe,
     PaginationComponent
