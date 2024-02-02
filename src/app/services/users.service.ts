@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, input } from '@angular/core';
 import { createClient } from '@supabase/supabase-js';
 import { Observable, Subject, from, tap } from 'rxjs';
 import { IUser } from '../interfaces/user';
 import { environments } from '../../environments/environments';
+import { FormGroup } from '@angular/forms';
 
 const emptyUser: IUser = {
   id: '0',
@@ -17,14 +18,16 @@ const emptyUser: IUser = {
 })
 export class UsersService {
   supaClient: any = null;
-
+  urlAuxiliar!: string;
   constructor() {
     this.supaClient = createClient(
       environments.supabaseUrl,
       environments.supabaseKey
     );
   }
-
+    setUrlAuxiliar(params:string) {
+      this.urlAuxiliar=params;
+  }
   userSubject: Subject<IUser> = new Subject();
   favoritesSubject: Subject<{ id: number; uid: string; artwork_id: string }[]> =
     new Subject();
@@ -154,14 +157,55 @@ export class UsersService {
         this.userSubject.next(profile.data[0]);
       });
   }
-
+ 
   async isLogged() {
     let { data, error } = await this.supaClient.auth.getSession();
     if (data.session) {
       this.getProfile(data.session.user.id);
     }
   }
+  async updateProfile(profileData: any): Promise<any> {
+    console.log('updateProfile', profileData);
+  
+    let { data, error } = await this.supaClient.auth.getSession();
+    console.log(profileData.username,'nombre de usuario');
+    console.log(profileData.full_name,'nombre de fullnombre');
+   
+   
+    let promiseUpdate: Promise<boolean> = this.supaClient
+      .from('profiles')
+      .update({
+        username: profileData.username,
+        full_name: profileData.full_name,
+        avatar_url: this.urlAuxiliar,
+        website: profileData.website
+      })
+      .eq('id', data.session.user.id)
+      ;
+  
+    console.log('Entra a actualizar el perfil');
+  
+    promiseUpdate.then(() => this.getProfile(data.session.user.id));
+    
+  }
+  async subirImagenASupabase(file: File): Promise<string> {
+    try {
+      this.setUrlAuxiliar(file.name);
+      const { data, error } = await this.supaClient.storage
+        .from('avatars')
+        .upload(`/${file.name}`, file);
 
+      if (error) {
+        throw new Error('Error al subir la imagen a Supabase');
+      }
+
+     
+      return data.url;
+    } catch (error) {
+      console.error('Error al subir la imagen a Supabase:', error);
+      throw error;
+    }
+  }
   async logout() {
     const { error } = await this.supaClient.auth.signOut();
     this.userSubject.next(emptyUser);
@@ -190,7 +234,7 @@ export class UsersService {
       if (data && data.length > 0) {
         return data.map((item: any) => item.artwork_id);
       } else {
-        return []; // Retorna un array vacío si no se encontraron registros
+        return []; 
       }
     } catch (error) {
       console.error('Error al obtener los artwork_id:', error);
@@ -224,7 +268,7 @@ export class UsersService {
       alert('Login First');// si estamos logueados o no
       return;
     }
-    // Verificar si ya existe una fila con el mismo uid y artwork_id
+    
     const existingFavorite = await this.supaClient
       .from('Favorites')
       .select('*')

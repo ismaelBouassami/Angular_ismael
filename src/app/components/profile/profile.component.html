@@ -67,7 +67,7 @@
 
         <div class="mb-3">
           <label for="avatarInput" class="form-label"  style="font-weight:bold ;">Subir Avatar:</label>
-          <input type="file" id="avatarInput" formControlName="avatarUpload" class="form-control" accept="image/*" (change)="cargarImagen($event)">
+          <input type="file" id="avatarInput"  class="form-control" accept="image/*" (change)="cargarImagen($event)">
         </div>
         
         <div *ngIf="formulario.get('avatar_url')?.value" class="mb-3">

@@ -4,6 +4,8 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validator
 import { UsersService } from '../../services/users.service';
 import { map } from 'rxjs';
 import { IUser } from '../../interfaces/user';
+import { HttpClient } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-profile',
@@ -16,19 +18,30 @@ export class ProfileComponent implements OnInit {
 
 
 
-  constructor(private formBuilder: FormBuilder, private userService: UsersService) { this.crearFormulario() }
+  constructor(private formBuilder: FormBuilder, private userService: UsersService,private http: HttpClient) { this.crearFormulario() }
 
   formulario!: FormGroup;
+  avatarFile: File | null = null;
   enviarFormulario() {
-    if (this.formulario.get('website')?.valid||this.formulario.get('username')?.valid) {
-      const formData = this.formulario.value;
+   
+    console.log(this.formulario.value);
+   
+    if (this.formulario.valid) {
+      if (this.avatarFile) {
+        this.userService.subirImagenASupabase(this.avatarFile);
+      }
       
-      console.log('Enviando formulario:', formData);
-
-    } else {
-
-      console.log('El formulario no es válido. Por favor, completa todos los campos obligatorios.');
-    }
+          const profileData = this.formulario.value;
+          this.userService.updateProfile(profileData)
+            .then(() => {
+              console.log('Perfil actualizado correctamente');
+              location.reload();
+            })
+            .catch(error => {
+              console.error('Error al actualizar el perfil:', error);
+              
+            });
+        }
   }
 
   crearFormulario() {
@@ -40,21 +53,35 @@ export class ProfileComponent implements OnInit {
       website: ['', Validators.compose([Validators.required, WebsiteValidator('http.*')])],
     })
   }
+ 
   cargarImagen(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      // Validar que el archivo seleccionado sea una imagen
-      if (file.type.startsWith('image/')) {
-        // Cargar la imagen seleccionada en el formulario como base64
+    this.avatarFile = event.target.files[0];
+    // if (this.avatarFile) {
+      
+    //     const imageUrl = URL.createObjectURL(file); 
+    //     console.log('Ruta absoluta del archivo:', imageUrl);
+        
+        
+    // }
+    
+    if (this.avatarFile) {
+   
+      if (this.avatarFile.type.startsWith('image/')) {
+       
         const reader = new FileReader();
         reader.onload = () => {
           this.formulario.patchValue({
             avatar_url: reader.result
+            
           });
+          
+          
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(this.avatarFile);
+
+
       } else {
-        // Si el archivo seleccionado no es una imagen, mostrar un mensaje de error o tomar otra acción
+       
         console.error('El archivo seleccionado no es una imagen.');
       }
     }
@@ -88,9 +115,21 @@ export class ProfileComponent implements OnInit {
 }
 
 
-function enviarFormulario() {
+// enviarFormulario(formularios: FormGroup) {
+//   if (this.formularios.valid) {
+//     const profileData = formularios.value;
+//     this.userService.updateProfile(profileData)
+//       .then(() => {
+//         console.log('Perfil actualizado correctamente');
+//         // Realiza cualquier otra acción necesaria después de actualizar el perfil
+//       })
+//       .catch(error => {
+//         console.error('Error al actualizar el perfil:', error);
+//         // Maneja el error según tus necesidades
+//       });
+//   }
+// }
 
-}
 function WebsiteValidator(pattern: string): ValidatorFn {
   return (c: AbstractControl): { [key: string]: any } | null => {
     if (c.value) {

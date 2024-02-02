@@ -41,15 +41,18 @@ export class ArtworkListComponent implements OnInit {
           this.currentPage= this.paginacionService.getVariable();
         }
       
+       
         const regex = /\/artwork\/page\/\d+/;
         const match = event.url.match(regex);
         if (match) {
-          console.log('entra en el cambio de ruta')
+          console.log('entra en el cambio de ruta',event.url)
           console.log('Número de página:', this.currentPage,) ;
           // Llamar a la función para manejar el cambio de ruta con el número de página
           this.nextPageArtwoks();
         }else{
           this.paginacionService.setVariable(1);
+          
+
         }
       }
     });
