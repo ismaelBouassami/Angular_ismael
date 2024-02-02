@@ -1,27 +1,89 @@
-<form [formGroup]="formulario">
-    <div class="input-group mb-3">
-        <span class="input-group-text" id="basic-addon1"></span>
-        <input formControlName="username" type="text" name="username" class="form-control" placeholder="Username" aria-label="Username" [ngClass]="usernameNotValid ? 'is-invalid': 'is-valid'"
-          aria-describedby="basic-addon1" />
-      </div>
-      <div class="input-group mb-3">
-        <input formControlName="full_name" name="full-name" type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username"
-          aria-describedby="basic-addon2" />
-        <span class="input-group-text" id="basic-addon2"></span>
-      </div>
-      <label for="basic-url" class="form-label">Your vanity URL</label>
-      <div class="input-group mb-3">
-        <span class="input-group-text" id="basic-addon3">art/</span>
-        <input formControlName="website" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3 " name="website" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-text">With textarea</span>
-        <textarea class="form-control" aria-label="With textarea"></textarea>
-      </div>
-    </form>
-    @if (!formulario.valid) {
-        <div>
-            No valid
+<!-- <form [formGroup]="formulario">
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon1"></span>
+    <input formControlName="username" type="text" name="username" class="form-control" placeholder="Username"
+      aria-label="Username" [ngClass]="usernameNotValid ? 'is-invalid': 'is-valid'" aria-describedby="basic-addon1" />
+  </div>
+  <div class="input-group mb-3">
+    <input formControlName="full_name" name="full-name" type="text" class="form-control"
+      placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+    <span class="input-group-text" id="basic-addon2"></span>
+  </div>
+  <label for="basic-url" class="form-label">Your vanity URL</label>
+  <div class="input-group mb-3">
+    <span class="input-group-text" id="basic-addon3">art/</span>
+    <input formControlName="website" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3 "
+      name="website" [ngClass]="websiteNotValid ? 'is-invalid': 'is-valid'"  />
+  </div>
+
+  <div class="input-group">
+    <span class="input-group-text">With textarea</span>
+    <textarea class="form-control" aria-label="With textarea"></textarea>
+  </div>
+  <button type="button" class="btn btn-primary" (click)="enviarFormulario()">Enviar</button>
+</form>
+@if (!formulario.valid) {
+<div>
+  No valid
+</div>
+}
+<div>{{formulario.value| json}}</div>
+<div> {{formulario.get('website')?.valid}}</div> -->
+
+<br>
+<br>
+<h1 class="text-center">Profile User</h1>
+<br><br><br>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form [formGroup]="formulario">
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text bold" id="basic-addon1" style="font-weight:bold ;">Username:</span>
+            <input formControlName="username" type="text" name="username" class="form-control" placeholder="Username"
+              aria-label="Username" [ngClass]="usernameNotValid ? 'is-invalid': 'is-valid'" aria-describedby="basic-addon1" />
+          </div>
         </div>
-    }
-    <div>{{formulario.value| json}}</div><div> {{formulario.get('website')?.valid}}</div>
+        <div *ngIf="!formulario.get('username')?.valid" class="alert alert-danger mt-3">Username not valid (minimum 5 characters)</div>
+        <div class="mb-3">
+          <div class="input-group">
+            <span class="input-group-text" id="basic-addon2" style="font-weight:bold ;">Full name</span>
+            <input formControlName="full_name" name="full-name" type="text" class="form-control"
+              placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2" />
+            
+          </div>
+        </div>
+        <div *ngIf="!formulario.get('full_name')?.valid" class="alert alert-danger mt-3">Full name Required</div>
+        <div class="mb-3">
+       
+          <div class="input-group">
+            <span class="input-group-text" id="basic-addon3" style="font-weight:bold ;">Your website</span>
+            <input formControlName="website" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3 "
+              name="website" [ngClass]="websiteNotValid ? 'is-invalid': 'is-valid'"  />
+          </div>
+        </div>
+        <div *ngIf="!formulario.get('website')?.valid" class="alert alert-danger mt-3">website required</div>
+
+        <div class="mb-3">
+          <label for="avatarInput" class="form-label"  style="font-weight:bold ;">Subir Avatar:</label>
+          <input type="file" id="avatarInput" formControlName="avatarUpload" class="form-control" accept="image/*" (change)="cargarImagen($event)">
+        </div>
+        
+        <div *ngIf="formulario.get('avatar_url')?.value" class="mb-3">
+          
+          <img [src]="formulario.get('avatar_url')?.value" class="img-fluid rounded" alt="Avatar" width="500px" height="500px">
+        </div>
+        
+        <div class="text-center">
+        <button type="button" class="btn btn-primary "[disabled]="formulario.invalid" (click)="enviarFormulario()">Enviar</button>
+      </div>
+      </form>
+     
+      
+     
+      <!-- <div>{{formulario.value | json}}</div>
+      <div>{{formulario.get('website')?.valid}}</div> -->
+    </div>
+  </div>
+</div>

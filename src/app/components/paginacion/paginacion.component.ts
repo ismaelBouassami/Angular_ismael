@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './paginacion.component.css'
 })
 export class PaginationComponent implements OnInit {
-  @Input() currentPage: number = 1;
+  @Input() currentPage: number= this.paginacionService.getVariable() ;
   @Input() totalPages: number = 0;
   pageNumberInput: number = 1;
 
@@ -24,7 +24,9 @@ export class PaginationComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchTotalPages(); 
-    this.paginacionService.getVariable();
+    this.paginacionService.setVariable(this.currentPage);
+    console.log('ONINIT de la paginacion' ,this.paginacionService.getVariable());
+    
   }
 
   fetchTotalPages(): void {
@@ -45,13 +47,16 @@ export class PaginationComponent implements OnInit {
   
   goPage(page:number): void{
     this.currentPage=page;
- this.paginacionService.setVariable(this.currentPage);
-    this.router.navigate(['/artwork/page/', page]);
+    this.paginacionService.setVariable(this.currentPage);
+    this.router.navigate(['/artwork/page/', this.currentPage]);
   }
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
+      console.log('antes de sumar la pagina'+this.currentPage);
+      
       this.currentPage += 1; 
       this.paginacionService.setVariable(this.currentPage);
+      this.router.navigate(['/artwork/page/', this.currentPage]);
       console.log('sumando paginas '+this.currentPage);
       
     }

@@ -28,10 +28,16 @@ export class ApiServiceService {
   }
   public getArtWorksPage(pageNumber: number): Observable<IArtwork[]> {
     const url1 = `${url}?page=${pageNumber}`;
-
-    return this.http.get<{ data: IArtwork[] }>(url1).pipe(
+    console.log("url===>"+ url1);
+     this.http.get<{ data: IArtwork[] }>(url1).pipe(
       map(response => response.data)
-    );
+    ).subscribe((artworks) => {
+      console.log(artworks);
+      
+      this.artworksSubject.next(artworks);
+      
+    });
+    return this.artworksSubject;
     }
 
   public filterArtWorks(filter:string): void{

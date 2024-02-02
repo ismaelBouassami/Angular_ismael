@@ -13,19 +13,19 @@ export class PaginacionService {
             total: 0,
             limit: 0,
             first_page:1,
-            current_page: 0,
+            current_page: 1,
             total_pages: 0,
            
         };
       }
 
-  // Método para establecer la variable compartida
-  setVariable(valor: any): void {
-    this.currentPageService = valor;
+
+  setVariable(valor: number): void {
+    this.pagination.current_page = valor;
   }
 
-  // Método para obtener la variable compartida
-  getVariable(): any {
-    return this.currentPageService;
+  
+  getVariable(): number {
+    return this.pagination.current_page;
   }
 }

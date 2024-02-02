@@ -37,7 +37,10 @@ export class ArtworkListComponent implements OnInit {
     this.router.events.subscribe(event => {
       
       if (event instanceof NavigationEnd) {
-        this.currentPage= this.paginacionService.getVariable();
+        if (this.currentPage!=this.paginacionService.getVariable()) {
+          this.currentPage= this.paginacionService.getVariable();
+        }
+      
         const regex = /\/artwork\/page\/\d+/;
         const match = event.url.match(regex);
         if (match) {
@@ -45,12 +48,14 @@ export class ArtworkListComponent implements OnInit {
           console.log('Número de página:', this.currentPage,) ;
           // Llamar a la función para manejar el cambio de ruta con el número de página
           this.nextPageArtwoks();
+        }else{
+          this.paginacionService.setVariable(1);
         }
       }
     });
 
 
-    console.log(this.onlyFavorites);
+    // console.log(this.onlyFavorites);
     this.loadArtworks();
     if (this.onlyFavorites != 'favorites') {
       this.artService.getArtWorks()
@@ -98,18 +103,23 @@ export class ArtworkListComponent implements OnInit {
     ).subscribe(filter => this.artService.filterArtWorks(filter));
 
   }
+  
   loadArtworks(): void {
     this.artService.getArtWorks().subscribe((artworks: IArtwork[]) => {
       this.quadres = artworks;
       this.pagedItems = artworks;
     });
   }
+
   nextPageArtwoks(): void{
-    console.log('Entra en el cambio de pagina nxtPageArtworks'+this.currentPage);
+    console.log('Entra en el cambio de pagina nxtPageArtworks '+this.currentPage);
     
-    this.artService.getArtWorksPage(this.currentPage).subscribe((artworks: IArtwork[])=>{
-      this.pagedItems = artworks;
-    })
+     this.artService.getArtWorksPage(this.currentPage).subscribe((artworks: IArtwork[])=>{
+       this.pagedItems = artworks;
+     });
+     this.paginacionService.setVariable(this.currentPage);
+
+
   }
 
 
