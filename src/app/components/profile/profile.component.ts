@@ -27,6 +27,8 @@ export class ProfileComponent implements OnInit {
     console.log(this.formulario.value);
    
     if (this.formulario.valid) {
+      console.log(this.avatarFile,'avatar file del archivo locureta tt');
+      
       if (this.avatarFile) {
         this.userService.subirImagenASupabase(this.avatarFile);
       }
@@ -35,7 +37,7 @@ export class ProfileComponent implements OnInit {
           this.userService.updateProfile(profileData)
             .then(() => {
               console.log('Perfil actualizado correctamente');
-              location.reload();
+              // location.reload();
             })
             .catch(error => {
               console.error('Error al actualizar el perfil:', error);

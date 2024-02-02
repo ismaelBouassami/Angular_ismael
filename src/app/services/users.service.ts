@@ -190,22 +190,30 @@ export class UsersService {
   }
   async subirImagenASupabase(file: File): Promise<string> {
     try {
-      this.setUrlAuxiliar(file.name);
+      // Setear una URL auxiliar (supongo que se utiliza para alguna lógica adicional)
+      this.setUrlAuxiliar('https://untktmroloftabtrymov.supabase.co/storage/v1/object/avatars/'+file.name);
+      
+      // Imprimir el nombre del archivo
+      console.log(file.name, 'subir imagen supabase');
+      
+      // Realizar la carga del archivo al almacenamiento de archivos
       const { data, error } = await this.supaClient.storage
         .from('avatars')
         .upload(`/${file.name}`, file);
-
+  
+      // Manejar errores si los hay
       if (error) {
         throw new Error('Error al subir la imagen a Supabase');
       }
-
-     
+  
+      // Devolver la URL de la imagen subida
       return data.url;
     } catch (error) {
       console.error('Error al subir la imagen a Supabase:', error);
       throw error;
     }
   }
+  
   async logout() {
     const { error } = await this.supaClient.auth.signOut();
     this.userSubject.next(emptyUser);
