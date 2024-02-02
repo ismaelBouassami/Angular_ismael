@@ -57,8 +57,35 @@ export class ArtworkListComponent implements OnInit {
         .subscribe((artworkList: IArtwork[]) => this.quadres = artworkList);
     }
     else {
-      this.artService.getArtworksFromIDs(['3752', '11294', '6010'])
-        .subscribe((artworkList: IArtwork[]) => this.quadres = artworkList);
+        
+      this.usesService.getUid()
+      .then(uid => {
+        this.uid = uid;
+        console.log('UID:', uid);
+        this.usesService.getArtworkIdsByUid(this.uid)
+        .then((favorites) => {
+          this.favoritesArray = favorites;
+          console.log('Favoritos:', favorites);
+          this.artService.getArtworksFromIDs(this.favoritesArray)
+          .subscribe((artworkList: IArtwork[]) => this.quadres = artworkList.map(art=>{
+            art.like =true;
+            return art;
+
+          }));
+
+        });
+        
+        
+        
+      })
+      .catch(error => {
+        console.error('Error al obtener el UID:', error);
+        
+      });
+      
+     
+      
+     
     }
 
 
@@ -86,9 +113,15 @@ export class ArtworkListComponent implements OnInit {
   toggleLike($event: boolean, artwork: IArtwork) {
     console.log($event, artwork);
     artwork.like = !artwork.like;
-    this.usesService.setFavorite(artwork.id + "")
+    if (artwork.like) {
+      this.usesService.setFavorite(artwork.id + "");
+    }else{
+      this.usesService.deleteFavorite(artwork.id + "");
+    }
+    
   }
-
+  uid!: string;
+  favoritesArray: string[] = [];
   quadres: IArtwork[] = [];
   pagedItems:IArtwork[]=[];
   currentPage!:number;
