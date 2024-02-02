@@ -231,8 +231,9 @@ export class UsersService {
       .eq('uid', data.session.user.id)
       .eq('artwork_id', artwork_id)
       ;
-
-    if (existingFavorite.data) {
+    console.log(existingFavorite.data.length);
+    
+    if (existingFavorite.data.length!=0) {
       
       console.log('Ya existe una fila con el mismo uid y artwork_id, no se hará nada.');
       return;
