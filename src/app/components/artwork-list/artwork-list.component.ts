@@ -68,6 +68,9 @@ export class ArtworkListComponent implements OnInit {
           console.log('Favoritos:', favorites);
           this.artService.getArtworksFromIDs(this.favoritesArray)
           .subscribe((artworkList: IArtwork[]) => this.quadres = artworkList.map(art=>{
+            if (this.favoritesArray) {
+              
+            }
             art.like =true;
             return art;
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createClient } from '@supabase/supabase-js';
 import { Observable, Subject, from, tap } from 'rxjs';
 import { IUser } from '../interfaces/user';
-import { environment } from '../../environments/environmets';
+import { environments } from '../../environments/environments';
 
 const emptyUser: IUser = {
   id: '0',
@@ -20,8 +20,8 @@ export class UsersService {
 
   constructor() {
     this.supaClient = createClient(
-      environment.supabaseUrl,
-      environment.supabaseKey
+      environments.supabaseUrl,
+      environments.supabaseKey
     );
   }
 
@@ -170,10 +170,10 @@ export class UsersService {
   getFavorites(uid: string): void {
     let promiseFavorites: Promise<{
       data: { id: number; uid: string; artwork_id: string }[];
-    }> = this.supaClient.from('favorites').select('*').eq('uid', uid);
+    }> = this.supaClient.from('Favorites').select('*').eq('uid', uid);
 
     promiseFavorites.then((data) => this.favoritesSubject.next(data.data));
-    
+
   }
 
   async getArtworkIdsByUid(uid: string): Promise<string[]> {
@@ -221,10 +221,22 @@ export class UsersService {
     let { data, error } = await this.supaClient.auth.getSession();
     console.log(data);
     if (data.session === null) {
-      alert('Login First');
+      alert('Login First');// si estamos logueados o no
       return;
     }
+    // Verificar si ya existe una fila con el mismo uid y artwork_id
+    const existingFavorite = await this.supaClient
+      .from('Favorites')
+      .select('*')
+      .eq('uid', data.session.user.id)
+      .eq('artwork_id', artwork_id)
+      ;
 
+    if (existingFavorite.data) {
+      
+      console.log('Ya existe una fila con el mismo uid y artwork_id, no se hará nada.');
+      return;
+    }
     let promiseFavorites: Promise<boolean> = this.supaClient
       .from('Favorites')
       .insert({ uid: data.session.user.id, artwork_id: artwork_id });
@@ -254,15 +266,8 @@ export class UsersService {
 
     console.log('Entra a eliminar de favorites');
 
-    promiseDelete
-  .then(() => this.getFavorites(data.session.user.id))
-  
+    promiseDelete.then(() => this.getFavorites(data.session.user.id));
 
-  //   window.location.reload();
-  // }
-}
-}
-/*
-npm install @supabase/supabase-js
 
-*/
+  }
+}
